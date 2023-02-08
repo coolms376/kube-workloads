@@ -8,13 +8,14 @@ spec:
   replicas: 3
   template: 
     metadata: 
-      env: dev
+      labels:
+        env: dev
     spec:
       containers:
         - image: montud/java-spring-app-demo:latest
           name: spring-app
           ports:
-            - containerPorts: 8080
+            - containerPort: 8080
           
   selector: 
     matchLabels:
