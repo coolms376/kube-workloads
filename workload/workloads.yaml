@@ -1,22 +1,90 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: deployment-spring-app
-  labels:
+  name: spring-app
+  labels: 
+    app: spring-app
     env: dev
 spec:
-  replicas: 3
-  template: 
-    metadata: 
+  template:
+    metadata:
+      name:
       labels:
+        app: spring-app
         env: dev
     spec:
       containers:
-        - image: montud/java-spring-app-demo:latest
+        - image: montud/spring-app-demo:v1
           name: spring-app
           ports:
-            - containerPort: 8080
-          
-  selector: 
+           - containerPort: 8080
+  replicas: 3
+  selector:
     matchLabels:
+      app: spring-app
       env: dev
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-db
+  labels: 
+    app: spring-app-db
+    env: dev
+spec:
+  template:
+    metadata:
+      name:
+      labels:
+        app: spring-app-db
+        env: dev
+    spec:
+      containers:
+        - image: montud/mysql-myimage:v2
+          name: mysql-my-image
+  replicas: 3
+  selector:
+    matchLabels:
+      app: spring-app-db
+      env: dev
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-db-svc
+  labels: 
+    app: spring-app-db
+    env: dev
+spec:
+  selector:
+    app: spring-app-db
+    env: dev
+  type: ClusterIP
+  ports:
+    - name: mysql-ports
+      port: 3306
+      targetPort: 3360  
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-service
+  labels: 
+    app: spring-app
+    env: dev
+spec:
+  selector: 
+    app: spring-app
+    env: dev
+  type: NodePort
+  ports:
+    - name: app-port
+      port: 8080
+      nodePort: 32000
+      targetPort: 8080  
+
+      
